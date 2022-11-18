@@ -35,6 +35,14 @@ module.exports.getUser = (req, res) => {
         res.status(err.code).send({ message: err.message });
         return;
       }
+      if (err.name === "CastError") {
+        res
+          .status(ERROR_CODE)
+          .send({
+            message: "Переданы некорректные данные при поиске профиля.",
+          });
+        return;
+      }
       res.status(500).send({ message: "Произошла ошибка" });
     });
 };
@@ -75,6 +83,14 @@ module.exports.updateUser = (req, res) => {
           });
         return;
       }
+      if (err.name === "CastError") {
+        res
+          .status(ERROR_CODE)
+          .send({
+            message: "Переданы некорректные данные при поиске профиля.",
+          });
+        return;
+      }
       res.status(500).send({ message: "Произошла ошибка" });
     });
 };
@@ -104,6 +120,14 @@ module.exports.updateUserAvatar = (req, res) => {
           .status(ERROR_CODE)
           .send({
             message: "Переданы некорректные данные при обновлении аватара.",
+          });
+        return;
+      }
+      if (err.name === "CastError") {
+        res
+          .status(ERROR_CODE)
+          .send({
+            message: "Переданы некорректные данные при поиске профиля.",
           });
         return;
       }

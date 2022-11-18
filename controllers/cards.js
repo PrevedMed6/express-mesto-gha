@@ -37,6 +37,14 @@ module.exports.deleteCard = (req, res) => {
         res.status(err.code).send({ message: err.message });
         return;
       }
+      if (err.name === "CastError") {
+        res
+          .status(ERROR_CODE)
+          .send({
+            message: "Переданы некорректные данные при поиске карточки.",
+          });
+        return;
+      }
       res.status(500).send({ message: "Произошла ошибка" });
     });
 };
@@ -62,6 +70,14 @@ module.exports.likeCard = (req, res) => {
         });
         return;
       }
+      if (err.name === "CastError") {
+        res
+          .status(ERROR_CODE)
+          .send({
+            message: "Переданы некорректные данные при поиске карточки.",
+          });
+        return;
+      }
       res.status(500).send({ message: "Произошла ошибка" });
     });
 };
@@ -85,6 +101,14 @@ module.exports.dislikeCard = (req, res) => {
         res.status(ERROR_CODE).send({
           message: "Переданы некорректные данные для снятия лайка.",
         });
+        return;
+      }
+      if (err.name === "CastError") {
+        res
+          .status(ERROR_CODE)
+          .send({
+            message: "Переданы некорректные данные при поиске карточки.",
+          });
         return;
       }
       res.status(500).send({ message: "Произошла ошибка" });
