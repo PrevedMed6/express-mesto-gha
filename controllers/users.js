@@ -1,8 +1,6 @@
-/* eslint-disable comma-dangle */
-const UserNotFoundError = require("../utils/UserNotFoundError");
-const User = require("../models/user");
-
-const ERROR_CODE = 400;
+const errorCodes = require('../utils/ErrorCodes');
+const UserNotFoundError = require('../utils/UserNotFoundError');
+const User = require('../models/user');
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -12,15 +10,15 @@ module.exports.createUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        res
-          .status(ERROR_CODE)
-          .send({
-            message: "Переданы некорректные данные при создании пользователя.",
-          });
+      if (err.name === 'ValidationError') {
+        res.status(errorCodes.BAD_REQUEST_ERROR).send({
+          message: 'Переданы некорректные данные при создании пользователя.',
+        });
         return;
       }
-      res.status(500).send({ message: "Произошла ошибка" });
+      res
+        .status(errorCodes.DEFAULT_ERROR)
+        .send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -35,22 +33,24 @@ module.exports.getUser = (req, res) => {
         res.status(err.code).send({ message: err.message });
         return;
       }
-      if (err.name === "CastError") {
-        res
-          .status(ERROR_CODE)
-          .send({
-            message: "Переданы некорректные данные при поиске профиля.",
-          });
+      if (err.name === 'CastError') {
+        res.status(errorCodes.BAD_REQUEST_ERROR).send({
+          message: 'Переданы некорректные данные при поиске профиля.',
+        });
         return;
       }
-      res.status(500).send({ message: "Произошла ошибка" });
+      res
+        .status(errorCodes.DEFAULT_ERROR)
+        .send({ message: 'Произошла ошибка' });
     });
 };
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch(() => res
+      .status(errorCodes.DEFAULT_ERROR)
+      .send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.updateUser = (req, res) => {
@@ -64,7 +64,7 @@ module.exports.updateUser = (req, res) => {
     {
       new: true,
       runValidators: true,
-    }
+    },
   )
     .then((user) => {
       if (!user) throw new UserNotFoundError();
@@ -75,23 +75,19 @@ module.exports.updateUser = (req, res) => {
         res.status(err.code).send({ message: err.message });
         return;
       }
-      if (err.name === "ValidationError") {
-        res
-          .status(ERROR_CODE)
-          .send({
-            message: "Переданы некорректные данные при обновлении профиля.",
-          });
+      if (err.name === 'ValidationError') {
+        res.status(errorCodes.BAD_REQUEST_ERROR).send({
+          message: 'Переданы некорректные данные при обновлении профиля.',
+        });
         return;
       }
-      if (err.name === "CastError") {
-        res
-          .status(ERROR_CODE)
-          .send({
-            message: "Переданы некорректные данные при поиске профиля.",
-          });
+      if (err.name === 'CastError') {
+        res.status(errorCodes.BAD_REQUEST_ERROR).send({
+          message: 'Переданы некорректные данные при поиске профиля.',
+        });
         return;
       }
-      res.status(500).send({ message: "Произошла ошибка" });
+      res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -104,7 +100,8 @@ module.exports.updateUserAvatar = (req, res) => {
     },
     {
       new: true,
-    }
+      runValidators: true,
+    },
   )
     .then((user) => {
       if (!user) throw new UserNotFoundError();
@@ -115,22 +112,18 @@ module.exports.updateUserAvatar = (req, res) => {
         res.status(err.code).send({ message: err.message });
         return;
       }
-      if (err.name === "ValidationError") {
-        res
-          .status(ERROR_CODE)
-          .send({
-            message: "Переданы некорректные данные при обновлении аватара.",
-          });
+      if (err.name === 'ValidationError') {
+        res.status(errorCodes.BAD_REQUEST_ERROR).send({
+          message: 'Переданы некорректные данные при обновлении аватара.',
+        });
         return;
       }
-      if (err.name === "CastError") {
-        res
-          .status(ERROR_CODE)
-          .send({
-            message: "Переданы некорректные данные при поиске профиля.",
-          });
+      if (err.name === 'CastError') {
+        res.status(errorCodes.BAD_REQUEST_ERROR).send({
+          message: 'Переданы некорректные данные при поиске профиля.',
+        });
         return;
       }
-      res.status(500).send({ message: "Произошла ошибка" });
+      res.status(500).send({ message: 'Произошла ошибка' });
     });
 };

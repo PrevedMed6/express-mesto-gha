@@ -1,8 +1,6 @@
-/* eslint-disable comma-dangle */
-const CardNotFoundError = require("../utils/CardNotFoundError");
-const Card = require("../models/card");
-
-const ERROR_CODE = 400;
+const errorCodes = require('../utils/ErrorCodes');
+const CardNotFoundError = require('../utils/CardNotFoundError');
+const Card = require('../models/card');
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
@@ -10,20 +8,24 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        res.status(ERROR_CODE).send({
-          message: "Переданы некорректные данные при создании карточки.",
+      if (err.name === 'ValidationError') {
+        res.status(errorCodes.BAD_REQUEST_ERROR).send({
+          message: 'Переданы некорректные данные при создании карточки.',
         });
         return;
       }
-      res.status(500).send({ message: "Произошла ошибка" });
+      res
+        .status(errorCodes.DEFAULT_ERROR)
+        .send({ message: 'Произошла ошибка' });
     });
 };
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: "Произошла ошибка" }));
+    .catch(() => res
+      .status(errorCodes.DEFAULT_ERROR)
+      .send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.deleteCard = (req, res) => {
@@ -37,15 +39,13 @@ module.exports.deleteCard = (req, res) => {
         res.status(err.code).send({ message: err.message });
         return;
       }
-      if (err.name === "CastError") {
-        res
-          .status(ERROR_CODE)
-          .send({
-            message: "Переданы некорректные данные при поиске карточки.",
-          });
+      if (err.name === 'CastError') {
+        res.status(errorCodes.BAD_REQUEST_ERROR).send({
+          message: 'Переданы некорректные данные при поиске карточки.',
+        });
         return;
       }
-      res.status(500).send({ message: "Произошла ошибка" });
+      res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -53,7 +53,7 @@ module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .then((card) => {
       if (!card) throw new CardNotFoundError();
@@ -64,21 +64,15 @@ module.exports.likeCard = (req, res) => {
         res.status(err.code).send({ message: err.message });
         return;
       }
-      if (err.name === "ValidationError") {
-        res.status(ERROR_CODE).send({
-          message: "Переданы некорректные данные для постановки лайка.",
+      if (err.name === 'CastError') {
+        res.status(errorCodes.BAD_REQUEST_ERROR).send({
+          message: 'Переданы некорректные данные при поиске карточки.',
         });
         return;
       }
-      if (err.name === "CastError") {
-        res
-          .status(ERROR_CODE)
-          .send({
-            message: "Переданы некорректные данные при поиске карточки.",
-          });
-        return;
-      }
-      res.status(500).send({ message: "Произошла ошибка" });
+      res
+        .status(errorCodes.DEFAULT_ERROR)
+        .send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -86,7 +80,7 @@ module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { new: true }
+    { new: true },
   )
     .then((card) => {
       if (!card) throw new CardNotFoundError();
@@ -97,20 +91,14 @@ module.exports.dislikeCard = (req, res) => {
         res.status(err.code).send({ message: err.message });
         return;
       }
-      if (err.name === "ValidationError") {
-        res.status(ERROR_CODE).send({
-          message: "Переданы некорректные данные для снятия лайка.",
+      if (err.name === 'CastError') {
+        res.status(errorCodes.BAD_REQUEST_ERROR).send({
+          message: 'Переданы некорректные данные при поиске карточки.',
         });
         return;
       }
-      if (err.name === "CastError") {
-        res
-          .status(ERROR_CODE)
-          .send({
-            message: "Переданы некорректные данные при поиске карточки.",
-          });
-        return;
-      }
-      res.status(500).send({ message: "Произошла ошибка" });
+      res
+        .status(errorCodes.DEFAULT_ERROR)
+        .send({ message: 'Произошла ошибка' });
     });
 };
