@@ -87,7 +87,7 @@ module.exports.updateUser = (req, res) => {
         });
         return;
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
+      res.status(errorCodes.DEFAULT_ERROR).send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -124,6 +124,6 @@ module.exports.updateUserAvatar = (req, res) => {
         });
         return;
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
+      res.status(errorCodes.DEFAULT_ERROR).send({ message: 'Произошла ошибка' });
     });
 };
