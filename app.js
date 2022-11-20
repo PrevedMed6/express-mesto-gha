@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const users = require('./routes/users');
 const cards = require('./routes/cards');
 
-const { PORT = 3001 } = process.env;
+const { PORT = 3000 } = process.env;
 const app = express();
 app.use((req, res, next) => {
   req.user = {
