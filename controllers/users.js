@@ -3,9 +3,21 @@ const UserNotFoundError = require('../utils/UserNotFoundError');
 const User = require('../models/user');
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
 
-  User.create({ name, about, avatar })
+  User.create({
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  })
     .then((user) => {
       res.send({ data: user });
     })
@@ -87,7 +99,9 @@ module.exports.updateUser = (req, res) => {
         });
         return;
       }
-      res.status(errorCodes.DEFAULT_ERROR).send({ message: 'Произошла ошибка' });
+      res
+        .status(errorCodes.DEFAULT_ERROR)
+        .send({ message: 'Произошла ошибка' });
     });
 };
 
@@ -124,6 +138,8 @@ module.exports.updateUserAvatar = (req, res) => {
         });
         return;
       }
-      res.status(errorCodes.DEFAULT_ERROR).send({ message: 'Произошла ошибка' });
+      res
+        .status(errorCodes.DEFAULT_ERROR)
+        .send({ message: 'Произошла ошибка' });
     });
 };
