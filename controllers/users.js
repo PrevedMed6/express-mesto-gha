@@ -1,6 +1,7 @@
 const errorCodes = require('../utils/ErrorCodes');
 const UserNotFoundError = require('../utils/UserNotFoundError');
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
 
 module.exports.createUser = (req, res) => {
   const {
@@ -141,5 +142,26 @@ module.exports.updateUserAvatar = (req, res) => {
       res
         .status(errorCodes.DEFAULT_ERROR)
         .send({ message: 'Произошла ошибка' });
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', '7d');
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000,
+          httpOnly: true,
+          sameSite: true
+        })
+        .end();
+    })
+    .catch((err) => {
+      // ошибка аутентификации
+      res
+        .status(401)
+        .send({ message: err.message });
     });
 };
