@@ -1,21 +1,21 @@
 /* eslint-disable no-console */
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const users = require('./routes/users');
 const cards = require('./routes/cards');
+const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 const app = express();
-app.use((req, res, next) => {
-  req.user = {
-    _id: '636815419ec47a7ec4d70859',
-  };
-
-  next();
-});
+app.post('/signin', login);
+app.post('/signup', createUser);
+app.use(auth);
 app.use(express.json());
 app.use('/', users);
 app.use('/', cards);
+
 app.use((req, res) => {
   res.status(404).send({ message: 'Страница не найдена' });
 });
