@@ -29,7 +29,10 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findOneAndDelete({
+    "_id": req.params.cardId,
+    "owner": req.user._id
+  })
     .then((card) => {
       if (!card) throw new CardNotFoundError();
       res.send({ data: card });

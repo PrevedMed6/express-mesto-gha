@@ -1,9 +1,8 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const errorCodes = require('../utils/ErrorCodes');
 const UserNotFoundError = require('../utils/UserNotFoundError');
 const User = require('../models/user');
-
-const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.createUser = (req, res) => {
   const {
@@ -14,12 +13,12 @@ module.exports.createUser = (req, res) => {
     password,
   } = req.body;
 
-  User.create({
+  bcrypt.hash(password, 10).then(hash => User.create({
     name,
     about,
     avatar,
     email,
-    password,
+    password:hash,
   })
     .then((user) => {
       res.send({ data: user });
@@ -34,7 +33,7 @@ module.exports.createUser = (req, res) => {
       res
         .status(errorCodes.DEFAULT_ERROR)
         .send({ message: 'Произошла ошибка' });
-    });
+    }));
 };
 
 module.exports.getUser = (req, res) => {
@@ -170,7 +169,7 @@ module.exports.login = (req, res) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        'c7c10cc91cc20870e038950e9928a8fba0c38d76b582e3ec61522953117bc151',
       );
       res
         .cookie('jwt', token, {
@@ -184,3 +183,5 @@ module.exports.login = (req, res) => {
       res.status(401).send({ message: err.message });
     });
 };
+
+
