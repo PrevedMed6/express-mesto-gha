@@ -1,11 +1,12 @@
 module.exports = (err, req, res, next) => {
-  const { statusCode = 500, message } = err;
+  const { code = 500, message } = err;
 
   res
-    .status(statusCode)
+    .status(code)
     .send({
-      message: statusCode === 500
+      message: code === 500
         ? 'На сервере произошла ошибка'
-        : message
+        : message,
     });
+  next();
 };

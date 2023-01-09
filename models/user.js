@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator(mail) {
-        return validator.isEmail(mail); // если возраст меньше 18, вернётся false
+        return validator.isEmail(mail);
       },
       message: 'Некорректный почтовый адрес.',
     },

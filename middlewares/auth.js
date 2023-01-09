@@ -17,10 +17,9 @@ module.exports = (req, res, next) => {
       'c7c10cc91cc20870e038950e9928a8fba0c38d76b582e3ec61522953117bc151',
     );
   } catch (err) {
-    return res.status(401).send({ message: 'Необходима авторизация' });
+    next(err);
   }
 
   req.user = payload;
-
   next();
 };
