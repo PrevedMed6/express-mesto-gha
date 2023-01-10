@@ -28,20 +28,27 @@ module.exports.getCards = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findOneAndDelete({
+  Card.findOne({
     _id: req.params.cardId,
-    owner: req.user._id,
-  })
-    .then((card) => {
-      if (!card) throw new NoPrivilegiesError();
-      res.send({ data: card });
+  }).then((card) => {
+    if (!card) {
+      throw new NotFoundError(NOT_FOUND_ERROR_TEXT);
+    }
+    Card.findOneAndDelete({
+      _id: req.params.cardId,
+      owner: req.user._id,
     })
-    .catch((err) => {
-      if (err.name === errorNames.CAST_ERROR_NAME) {
-        next(new BadRequestError(CAST_ERROR_TEXT));
-      }
-      next(err);
-    });
+      .then((delCard) => {
+        if (!delCard) throw new NoPrivilegiesError();
+        res.send({ data: delCard });
+      })
+      .catch((err) => {
+        if (err.name === errorNames.CAST_ERROR_NAME) {
+          next(new BadRequestError(CAST_ERROR_TEXT));
+        }
+        next(err);
+      });
+  });
 };
 
 module.exports.likeCard = (req, res, next) => {
