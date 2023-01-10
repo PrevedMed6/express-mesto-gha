@@ -33,7 +33,7 @@ app.post(
       email: Joi.string()
         .required()
         .email({ minDomainSegments: 2, tlds: { allow: ['ru', 'com', 'net'] } }),
-      password: Joi.string().required().alphanum().min(8),
+      password: Joi.string().required().min(8),
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
       avatar: Joi.string().regex(
