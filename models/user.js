@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const validator = require('validator');
@@ -19,7 +20,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator(avatar) {
-        return /^https?:\/\/(?:www\.)?[-a-zA-Z0-9-._~:/?#\[\]@!$&'()*+,;=]{1,256}$/.test(avatar);
+        return /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([a-zA-Z0-9/\-._~:?#[\]@!$&'()*+,;=]*)#?$/.test(avatar);
       },
       message: 'Некорректная ссылка.',
     },
