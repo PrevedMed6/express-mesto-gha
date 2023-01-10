@@ -1,7 +1,12 @@
-const CardNotFoundError = require('../utils/CardNotFoundError');
 const Card = require('../models/card');
-const CardValidationError = require('../utils/CardValidationError');
-const CardCastError = require('../utils/CardCastError');
+const NotFoundError = require('../utils/NotFoundError');
+const BadRequestError = require('../utils/BadRequestError');
+const NoPrivilegiesError = require('../utils/NoPrivilegiesError');
+const errorNames = require('../utils/ErrorNames');
+
+const VALIDATION_ERROR_TEXT = 'Переданы некорректные данные при создании карточки';
+const NOT_FOUND_ERROR_TEXT = 'Карточка с указанным _id не найдена';
+const CAST_ERROR_TEXT = 'Переданы некорректные данные при поиске карточки';
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
@@ -9,8 +14,8 @@ module.exports.createCard = (req, res, next) => {
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new CardValidationError());
+      if (err.name === errorNames.VALIDATION_ERROR_NAME) {
+        next(new BadRequestError(VALIDATION_ERROR_TEXT));
       }
       next(err);
     });
@@ -28,12 +33,12 @@ module.exports.deleteCard = (req, res, next) => {
     owner: req.user._id,
   })
     .then((card) => {
-      if (!card) throw new CardNotFoundError();
+      if (!card) throw new NoPrivilegiesError();
       res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new CardCastError());
+      if (err.name === errorNames.CAST_ERROR_NAME) {
+        next(new BadRequestError(CAST_ERROR_TEXT));
       }
       next(err);
     });
@@ -46,12 +51,12 @@ module.exports.likeCard = (req, res, next) => {
     { new: true },
   )
     .then((card) => {
-      if (!card) throw new CardNotFoundError();
+      if (!card) throw new NotFoundError(NOT_FOUND_ERROR_TEXT);
       res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new CardCastError());
+      if (err.name === errorNames.CAST_ERROR_NAME) {
+        next(new BadRequestError(CAST_ERROR_TEXT));
       }
       next(err);
     });
@@ -60,16 +65,16 @@ module.exports.likeCard = (req, res, next) => {
 module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
-      if (!card) throw new CardNotFoundError();
+      if (!card) throw new NotFoundError(NOT_FOUND_ERROR_TEXT);
       res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new CardCastError());
+      if (err.name === errorNames.CAST_ERROR_NAME) {
+        next(new BadRequestError(CAST_ERROR_TEXT));
       }
       next(err);
     });
