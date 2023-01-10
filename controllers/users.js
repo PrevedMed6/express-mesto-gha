@@ -7,8 +7,7 @@ const BadRequestError = require('../utils/BadRequestError');
 const UserDuplicateError = require('../utils/UserDuplicateError');
 const User = require('../models/user');
 
-const VALIDATION_ERROR_TEXT =
-  'Переданы некорректные данные при создании профиля';
+const VALIDATION_ERROR_TEXT = 'Переданы некорректные данные при создании профиля';
 const NOT_FOUND_ERROR_TEXT = 'Пользователь по указанному _id не найден';
 const CAST_ERROR_TEXT = 'Переданы некорректные данные при поиске профиля';
 
