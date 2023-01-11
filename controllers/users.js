@@ -140,15 +140,13 @@ module.exports.login = (req, res, next) => {
         { _id: user._id },
         'c7c10cc91cc20870e038950e9928a8fba0c38d76b582e3ec61522953117bc151',
       );
-      res.send({
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+        sameSite: true,
+      }).send({
         message: 'Авторизация успешна',
-      })
-        .cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-          sameSite: true,
-        })
-        .end();
+      }).end();
     })
     .catch(() => {
       next(new UnauthorizedError());
