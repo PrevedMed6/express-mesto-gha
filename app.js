@@ -9,6 +9,7 @@ const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const customErrors = require('./middlewares/errors');
 const pageNotFound = require('./middlewares/pageNotFound');
+const dotEnvConsts = require('./utils/DotEnvConsts');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -51,7 +52,7 @@ app.use(pageNotFound);
 app.use(errors());
 app.use(customErrors);
 
-mongoose.connect('mongodb://localhost:27017/mestodb');
+mongoose.connect(dotEnvConsts.SERVER_URL);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

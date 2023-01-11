@@ -3,10 +3,23 @@ const NotFoundError = require('../utils/NotFoundError');
 const BadRequestError = require('../utils/BadRequestError');
 const NoPrivilegiesError = require('../utils/NoPrivilegiesError');
 const errorNames = require('../utils/ErrorNames');
+const errorTexts = require('../utils/ErrorTexts');
 
-const VALIDATION_ERROR_TEXT = 'Переданы некорректные данные при создании карточки';
-const NOT_FOUND_ERROR_TEXT = 'Карточка с указанным _id не найдена';
-const CAST_ERROR_TEXT = 'Переданы некорректные данные при поиске карточки';
+function updateLike(cardId, params, options) {
+  return Card.findByIdAndUpdate(cardId, params, options)
+    .then((card) => {
+      if (!card) {
+        return Promise.reject(new NotFoundError(errorTexts.NOT_FOUND_ERROR_TEXT));
+      }
+      return card;
+    })
+    .catch((err) => {
+      if (err.name === errorNames.CAST_ERROR_NAME) {
+        return Promise.reject(new BadRequestError(errorTexts.CAST_ERROR_TEXT));
+      }
+      return Promise.reject(err);
+    });
+}
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
@@ -15,7 +28,7 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === errorNames.VALIDATION_ERROR_NAME) {
-        next(new BadRequestError(VALIDATION_ERROR_TEXT));
+        next(new BadRequestError(errorTexts.VALIDATION_ERROR_TEXT));
       }
       next(err);
     });
@@ -33,56 +46,46 @@ module.exports.deleteCard = (req, res, next) => {
   })
     .then((card) => {
       if (!card) {
-        throw new NotFoundError(NOT_FOUND_ERROR_TEXT);
+        throw new NotFoundError(errorTexts.NOT_FOUND_ERROR_TEXT);
       }
       Card.findOneAndDelete({
         _id: req.params.cardId,
         owner: req.user._id,
-      }).then((delCard) => {
-        if (!delCard) throw new NoPrivilegiesError();
-        res.send({ data: delCard });
-      }).catch(next);
+      })
+        .then((delCard) => {
+          if (!delCard) throw new NoPrivilegiesError();
+          res.send({ data: delCard });
+        })
+        .catch(next);
     })
     .catch((err) => {
       if (err.name === errorNames.CAST_ERROR_NAME) {
-        next(new BadRequestError(CAST_ERROR_TEXT));
+        next(new BadRequestError(errorTexts.CAST_ERROR_TEXT));
       }
       next(err);
     });
 };
 
 module.exports.likeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
+  updateLike(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
-      if (!card) throw new NotFoundError(NOT_FOUND_ERROR_TEXT);
       res.send({ data: card });
     })
-    .catch((err) => {
-      if (err.name === errorNames.CAST_ERROR_NAME) {
-        next(new BadRequestError(CAST_ERROR_TEXT));
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.dislikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
+  updateLike(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
-      if (!card) throw new NotFoundError(NOT_FOUND_ERROR_TEXT);
       res.send({ data: card });
     })
-    .catch((err) => {
-      if (err.name === errorNames.CAST_ERROR_NAME) {
-        next(new BadRequestError(CAST_ERROR_TEXT));
-      }
-      next(err);
-    });
+    .catch(next);
 };
